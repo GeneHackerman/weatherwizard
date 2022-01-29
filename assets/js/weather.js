@@ -158,3 +158,76 @@ function currentConditionsRequest(searchValue) {
         });
     });
 };
+
+
+// display and save search history
+function searchHistory(searchValue) {
+    // grab value entered in search bar
+    // var searchValue = searchCityInput.val().trim();
+
+    // array loop
+    if (cityList.indexOf(searchValue) === -1) {
+        cityList.push(searchValue);
+
+        // list all cities in user history
+        listArray();
+        clearHistoryButton.removeClass("hide");
+        weatherContent.removeClass("hide");
+    } else {
+        // remove existing value from array
+        var removeIndex = cityList.indexOf(searchValue);
+        cityList.splice(removeIndex, 1);
+
+        // push value to array again
+        cityList.push(searchValue);
+
+        // list all user history cities to display past entries at top of history
+        listArray();
+        clearHistoryButton.removeClass("hide");
+        weatherContent.removeClass("hide");
+    }
+    console.log(cityList); 
+
+}
+
+
+
+// list array at history sidebar
+function listArray() {
+    // clear elements in sidebar
+    searchHistoryList.empty();
+    // repopulate history with city array
+    cityList.forEach(function(city) {
+        var searchHistoryItem = $('<li class="list-group-item city-btn">');
+        searchHistoryItem.attr("data-value", city);
+        searchHistoryItem.text(city);
+        searchHistoryList.prepend(searchHistoryItem);
+    });
+    
+    // update list history in local storage
+    localStorage.setItem("cities", JSON.stringify(cityList));
+}
+
+// pull city list from local storage and updates city list for search history sidebar
+function initializeHistory() {
+    if (localStorage.getItem("cities")) {
+        cityList = JSON.parse(localStorage.getItem("cities"));
+        var lastIndex = cityList.length - 1;
+        
+        console.log(cityList);
+
+        listArray();
+        // displays last viewed city upon refresh
+        if (cityList.length !== 0) {
+            currentConditionsRequest(cityList[lastIndex]);
+            weatherContent.removeClass("hide");
+        }
+    }
+}
+
+// displays clear history btn if cities occupy search history sidebar
+function showClear() {
+    if (searchHistoryList.text() !== "") {
+        clearHistoryButton.removeClass("hide");
+    }
+}
